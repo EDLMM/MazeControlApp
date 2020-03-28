@@ -29,7 +29,7 @@ public class ShowMazeActivity extends AppCompatActivity {
         intent.putExtra("param1",data1);
         context.startActivity(intent);
     }
-
+    // to remote
     private ImageView iv_canvas;
     private Bitmap baseBitmap;
     private Canvas canvas;
