@@ -22,11 +22,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        QMUIStatusBarHelper.translucent(this);
         //初始化状态栏
+        QMUIStatusBarHelper.translucent(this);
         View root = LayoutInflater.from(this).inflate(R.layout.activity_main, null);
         ButterKnife.bind(this, root);
         initTopBar();
+
         setContentView(root);
 //        if (getIntent().getBooleanExtra("test_activity", false)) {
 //            Toast.makeText(this, "恢复到最近阅读(Boolean)", Toast.LENGTH_SHORT).show();

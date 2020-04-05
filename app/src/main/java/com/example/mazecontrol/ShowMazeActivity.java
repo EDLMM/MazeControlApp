@@ -10,7 +10,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,10 +21,15 @@ import android.view.View.OnTouchListener;
 import android.widget.Toast;
 
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 public class ShowMazeActivity extends AppCompatActivity {
-
+    @BindView(R.id.topbar)
+    QMUITopBarLayout mTopBar;
 
     public static void actionStart(Context context, String data1){
         Intent intent=new Intent(context,ShowMazeActivity.class );
@@ -38,23 +45,31 @@ public class ShowMazeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_maze);
+
         QMUIStatusBarHelper.translucent(this);
+        View root = LayoutInflater.from(this).inflate(R.layout.activity_show_maze, null);
+        ButterKnife.bind(this, root);
+        initTopBar();
+
+        setContentView(root);
+
+        // 触屏绘画
 
         // 初始化一个画笔，笔触宽度为5，颜色为红色
-        paint = new Paint();
-        paint.setStrokeWidth(5);
-        paint.setColor(Color.DKGRAY);
-
-        iv_canvas = (ImageView) findViewById(R.id.iv_canvas);
-//        btn_save = (Button) findViewById(R.id.btn_save);
-//        btn_resume = (Button) findViewById(R.id.btn_resume);
+//        paint = new Paint();
+//        paint.setStrokeWidth(5);
+//        paint.setColor(Color.DKGRAY);
 //
-//        btn_save.setOnClickListener(click);
-//        btn_resume.setOnClickListener(click);
-        iv_canvas.setOnTouchListener(touch);
+//
+//        iv_canvas = (ImageView) findViewById(R.id.iv_canvas);
+//        iv_canvas.setOnTouchListener(touch);
+
+
 
     }
+
+
+
     private View.OnTouchListener touch = new OnTouchListener() {
 
         // 定义手指开始触摸的坐标
@@ -126,5 +141,16 @@ public class ShowMazeActivity extends AppCompatActivity {
         }
     }
 
+    private void initTopBar() {
+//        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+////                overridePendingTransition(R.anim.slide_still, R.anim.slide_out_right);
+//            }
+//        });
+
+        mTopBar.setTitle("展示迷宫");
+    }
 
 }

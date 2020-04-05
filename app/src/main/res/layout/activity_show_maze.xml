@@ -9,23 +9,12 @@
 
     <com.qmuiteam.qmui.widget.QMUITopBarLayout
         android:id="@+id/topbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/qmui_topbar_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
         ></com.qmuiteam.qmui.widget.QMUITopBarLayout>
 
 
-    <ImageView
-        android:id="@+id/iv_canvas"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/btn_resume_canvas"
-        app:layout_constraintTop_toBottomOf="@+id/topbar"></ImageView>
 
 
     <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
@@ -40,6 +29,35 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
     <!--    android:src="@drawable/whie_square"-->
+
+
+<!--    <ImageView-->
+<!--        android:id="@+id/iv_canvas"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="0dp"-->
+
+<!--        android:layout_marginTop="32dp"-->
+<!--        android:layout_marginBottom="32dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/btn_resume_canvas"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/topbar">-->
+
+<!--    </ImageView>-->
+
+    <com.example.mazecontrol.Views.CustomView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btn_resume_canvas"
+        app:layout_constraintTop_toBottomOf="@+id/topbar"
+
+    />
+
 
 
 
