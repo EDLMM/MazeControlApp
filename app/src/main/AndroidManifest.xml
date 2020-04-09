@@ -9,7 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ShowMazeActivity"></activity>
+        <activity android:name=".PlayerSlaveActivity"></activity>
+        <activity android:name=".AdminHostActivity" />
+        <activity android:name=".ShowMazeActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -39,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
         ShowMazeActivity.actionStart(this,"start from mainAct");
     }
 
+    public void onClickAdminHostActivity(View view){
+        AdminHostActivity.actionStart(this,"start from mainAct");
+    }
+
     private void initTopBar() {
 //        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
 //            @Override

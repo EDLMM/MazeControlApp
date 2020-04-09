@@ -64,7 +64,7 @@ public class CustomView extends View {
         init(attrs);
     }
 
-    private void init(@Nullable AttributeSet set){
+    protected void init(@Nullable AttributeSet set){
 
         random = new Random();
         initPaint();
