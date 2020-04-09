@@ -20,6 +20,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.Toast;
 
+import com.example.mazecontrol.Views.CustomView;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 
@@ -42,6 +43,9 @@ public class ShowMazeActivity extends AppCompatActivity {
     private Canvas canvas;
     private Paint paint;
 
+    // CustomView, i.e. random maze generation
+    private CustomView randomMazeGame;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,9 +54,9 @@ public class ShowMazeActivity extends AppCompatActivity {
         View root = LayoutInflater.from(this).inflate(R.layout.activity_show_maze, null);
         ButterKnife.bind(this, root);
         initTopBar();
-
         setContentView(root);
 
+        randomMazeGame =(CustomView) findViewById(R.id.random_maze_game);
         // 触屏绘画
 
         // 初始化一个画笔，笔触宽度为5，颜色为红色
@@ -63,12 +67,12 @@ public class ShowMazeActivity extends AppCompatActivity {
 //
 //        iv_canvas = (ImageView) findViewById(R.id.iv_canvas);
 //        iv_canvas.setOnTouchListener(touch);
-
-
-
     }
 
-
+    public void onClickReGenerateMaze(View view){
+        randomMazeGame.onClickReGeneration();
+        Log.d("ShowMazeActivity","onClickReGenerateMaze");
+    }
 
     private View.OnTouchListener touch = new OnTouchListener() {
 

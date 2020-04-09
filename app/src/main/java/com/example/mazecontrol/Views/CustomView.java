@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -30,10 +31,11 @@ public class CustomView extends View {
 
     private Cell[][] cells;
     private Cell player,exit;
-    private static final int COLS=7, ROWS=10;
+    private static final int COLS=7, ROWS=10, GOLD_NUM=5;
+    private int gold_num_record=GOLD_NUM;
     private float cellSize,hMargin,vMargin;
     private static final float WALL_THICKNESS=4;
-    private Paint wallPaint,playerPaint,exitPaint;
+    private Paint wallPaint,playerPaint,exitPaint,goldPaint;
 
     private Random random;
 
@@ -83,6 +85,9 @@ public class CustomView extends View {
         exitPaint=new Paint();
         exitPaint.setColor(Color.BLUE);
 
+        goldPaint=new Paint();
+        goldPaint.setColor(Color.YELLOW);
+
     }
     @Override
     protected void onDraw(Canvas canvas){
@@ -105,7 +110,7 @@ public class CustomView extends View {
         }
         hMargin = (width-COLS*cellSize)/2;
         vMargin = (height-ROWS*cellSize)/2;
-
+        float margin = cellSize/10; //rectangle draw margin
         canvas.translate(hMargin,vMargin); // 修改坐标系原点
 
         for (int x=0; x<COLS;x++){
@@ -147,10 +152,18 @@ public class CustomView extends View {
                     );
                 }
 
+                // draw golds
+                if(cells[x][y].placeGold){
+                    canvas.drawRect(
+                            cells[x][y].col*cellSize+margin,
+                            cells[x][y].row*cellSize+margin,
+                            (cells[x][y].col+1)*cellSize-margin,
+                            (cells[x][y].row+1)*cellSize-margin,
+                            goldPaint
+                    );
+                }
             }
         }
-
-        float margin = cellSize/10;
 
 
         canvas.drawRect(
@@ -193,12 +206,20 @@ public class CustomView extends View {
                     player = cells[player.col+1][player.row];
                 break;
         }
+        checkEatGold();
         checkSuccess();
         invalidate();
     }
 
+    private void checkEatGold(){
+        if (player.placeGold==true){
+            player.placeGold=false;
+            gold_num_record--;
+        }
+    }
+
     private void checkSuccess(){
-        if(player==exit)
+        if(player==exit && gold_num_record<=0)
             createMaze();
     }
 
@@ -253,7 +274,12 @@ public class CustomView extends View {
         return super.onTouchEvent(event);
     }
 
-
+    public void onClickReGeneration(){
+        Log.d("ShowMazeActivity","reGenerate New Maze");
+//        return String.format("Successfully click ClickReGeneration,\nPass in message:%s",Pass_in);
+        createMaze();
+        invalidate();//refresh
+    }
 
     // Maze definition
     // recursive back tracker for randomly maze creation
@@ -288,6 +314,8 @@ public class CustomView extends View {
                 current = stack.pop();
         }while(!stack.empty());
 
+        // place golds
+        setGoldPlace();
     }
 
     private Cell getRandomUnvisitedNeighbour(Cell cell){
@@ -319,6 +347,26 @@ public class CustomView extends View {
         }
     }
 
+    private void setGoldPlace(){
+        ArrayList<Cell> golds = new ArrayList<>();
+
+        int gRow,gCol;
+        Cell selected;
+        while (golds.size() < GOLD_NUM){
+            gRow = random.nextInt(ROWS);
+            gCol = random.nextInt(COLS);
+            Log.d("ShowMazeActivity",String.format("3 generate gold at%d %d",gRow,gCol));
+            selected = cells[gCol][gRow];
+            if(selected!=cells[0][0]&&selected!=cells[COLS-1][ROWS-1]){
+                if (!golds.contains(selected)){
+                    golds.add(selected);
+                    selected.placeGold=true;
+                }
+            }
+        }
+    }
+
+    // only use in creation
     private void removeWall(Cell current, Cell next){
         //if current bellow next
         if(current.col == next.col && current.row ==next.row+1){
@@ -348,7 +396,8 @@ public class CustomView extends View {
                 leftWall = true,
                 rightWall = true,
                 bottomWall = true,
-                visited = false;
+                visited = false, // only for creation
+                placeGold = false;
 
         int col,row;
         public Cell(int col, int row){
