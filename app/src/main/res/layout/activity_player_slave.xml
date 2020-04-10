@@ -6,4 +6,74 @@
     android:layout_height="match_parent"
     tools:context=".PlayerSlaveActivity">
 
+<com.qmuiteam.qmui.widget.QMUITopBarLayout
+    android:id="@+id/topbar"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true"
+    ></com.qmuiteam.qmui.widget.QMUITopBarLayout>
+
+
+<!--    android:src="@drawable/whie_square"-->
+
+
+
+<!--<com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton-->
+<!--    android:id="@+id/btn_resume_canvas"-->
+<!--    style="@style/QDRoundButtonStyle"-->
+
+<!--    android:layout_width="wrap_content"-->
+<!--    android:layout_height="0dp"-->
+<!--    android:layout_marginBottom="36dp"-->
+<!--    android:onClick="onClickReGenerateMaze"-->
+<!--    android:text="重置"-->
+<!--    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--    app:layout_constraintEnd_toEndOf="parent"-->
+<!--    app:layout_constraintHorizontal_bias="0.089"-->
+<!--    app:layout_constraintStart_toStartOf="parent" />-->
+
+<com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+    android:id="@+id/btn_switch_reponse_stat"
+    style="@style/QDRoundButtonStyle"
+
+    android:layout_width="wrap_content"
+    android:layout_height="0dp"
+    android:layout_marginBottom="36dp"
+    android:onClick="onClickSwitchReponseStat"
+    android:text="切换响应状态"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.501"
+    app:layout_constraintStart_toStartOf="parent" />
+
+<!--<com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton-->
+<!--    android:id="@+id/btn_send_alert"-->
+<!--    style="@style/QDRoundButtonStyle"-->
+
+<!--    android:layout_width="wrap_content"-->
+<!--    android:layout_height="0dp"-->
+<!--    android:layout_marginBottom="36dp"-->
+<!--    android:onClick="onClickSendAlert"-->
+<!--    android:text="发送提醒"-->
+<!--    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--    app:layout_constraintEnd_toEndOf="parent"-->
+<!--    app:layout_constraintHorizontal_bias="0.919"-->
+<!--    app:layout_constraintStart_toStartOf="parent" />-->
+
+<com.example.mazecontrol.Views.CustomView
+    android:id="@+id/random_maze_game"
+
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:layout_marginTop="32dp"
+    android:layout_marginBottom="32dp"
+    app:layout_constraintBottom_toTopOf="@+id/btn_switch_reponse_stat"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.0"
+    app:layout_constraintStart_toStartOf="parent"
+
+    app:layout_constraintTop_toBottomOf="@+id/topbar"
+    app:layout_constraintVertical_bias="1.0" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

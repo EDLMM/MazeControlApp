@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Stack;
 
+import com.example.mazecontrol.Views.Cell;
+import com.example.mazecontrol.Views.CellGroup;
 
 // 定义了多种创建类的初始化方法，应对不同的情况
 public class CustomView extends View {
@@ -390,19 +392,7 @@ public class CustomView extends View {
         }
     }
 
-    private class Cell{
-        boolean
-                topWall = true,
-                leftWall = true,
-                rightWall = true,
-                bottomWall = true,
-                visited = false, // only for creation
-                placeGold = false;
-
-        int col,row;
-        public Cell(int col, int row){
-            this.col=col;
-            this.row=row;
-        }
+    public CellGroup getCells(){
+        return new CellGroup(cells,COLS,ROWS);
     }
 }

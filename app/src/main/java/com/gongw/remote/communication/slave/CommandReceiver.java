@@ -1,9 +1,16 @@
 package com.gongw.remote.communication.slave;
 
+import android.util.Log;
+
 import com.gongw.remote.RemoteConst;
 import com.gongw.remote.communication.CommunicationKey;
+import com.gongw.remote.communication.host.Command;
+
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,6 +20,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 /**
  * 用于接收命令和回写应答
@@ -61,6 +69,45 @@ public class CommandReceiver {
             this.socket = socket;
         }
 
+//        @Override
+//        public void run() {
+//            ObjectOutputStream os = null;
+//            ObjectInputStream is = null;
+//            try {
+//                Command admin,user;
+//                is = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+//                Object obj = is.readObject();
+//                if (obj != null) {
+//                    admin = (Command) obj;
+//                    // 通过这个 interface 把网络层反馈的string传递出来
+//                    listener.onReceive(admin.getContent());
+//                    Log.d("Remote",String.format("player receive: %s",admin.getContent()));
+////                    System.out.println("user: " + user.getName() + "/" + user.getPassword());
+//                }
+//
+//                Log.d("Remote",String.format("start Receiver"));
+//                os = new ObjectOutputStream(socket.getOutputStream());
+//
+//                user = new Command("Send by player",null);
+//                os.writeObject(user);
+//                os.flush();
+//
+//
+//            } catch(IOException | ClassNotFoundException ex) {
+////                logger.log(Level.SEVERE, null, ex);
+//            } finally {
+//                try {
+//                    is.close();
+//                } catch(Exception ex) {}
+//                try {
+//                    os.close();
+//                } catch(Exception ex) {}
+//                try {
+//                    socket.close();
+//                } catch(Exception ex) {}
+//            }
+//        }
+
         @Override
         public void run() {
             try {
@@ -95,10 +142,11 @@ public class CommandReceiver {
                     }
                 }
             }
-        }
+        };
+
     }
 
     public interface CommandListener{
-        String onReceive(String command);
+        String onReceive(String msg);
     }
 }

@@ -1,9 +1,15 @@
     package com.gongw.remote.communication.host;
 
+    import android.util.Log;
+
     import com.gongw.remote.RemoteConst;
     import com.gongw.remote.communication.CommunicationKey;
+
+    import java.io.BufferedInputStream;
     import java.io.IOException;
     import java.io.InputStream;
+    import java.io.ObjectInputStream;
+    import java.io.ObjectOutputStream;
     import java.io.OutputStream;
     import java.net.InetSocketAddress;
     import java.net.Socket;
@@ -13,6 +19,7 @@
     import java.util.concurrent.SynchronousQueue;
     import java.util.concurrent.ThreadPoolExecutor;
     import java.util.concurrent.TimeUnit;
+    import java.util.logging.Level;
 
     /**
      * 用于发送命令
@@ -49,6 +56,50 @@
             public CommandRunnable(Command command){
                 this.command = command;
             }
+
+//            @Override
+//            public void run() {
+//                ObjectInputStream is = null;
+//                ObjectOutputStream os = null;
+//
+//                Log.d("Remote", String.format("CommandSender.Runnable %s",command.getContent()));
+//                Socket socket = new Socket();
+//                try {
+//
+//                    socket.connect(new InetSocketAddress(command.getDestIp(), RemoteConst.COMMAND_RECEIVE_PORT));
+//                    Log.d("Remote", String.format("Admin successfully connected socket"));
+//                    is = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+//                    os = new ObjectOutputStream(socket.getOutputStream());
+//
+//                    Log.d("Remote", "admin os.write ");
+//                    os.writeObject(command);
+//                    os.flush();
+//
+//                    Object obj = is.readObject();
+//                    Command user = (Command) obj;
+//                    Log.d("Remote", "admin receive: " + user.getContent());
+//                    // 将网络层收到的内容传出
+//                    if(user!=null){
+//                        command.getCallback().onSuccess(user.getContent());
+//                    }
+//
+//                } catch (IOException ex) {
+//                    Log.d("Remote",String.format("%s"), ex);
+//                } catch(ClassNotFoundException ex) {
+//                    Log.d("Remote",String.format("%s"), ex);
+//                } finally {
+//                    try {
+//                        is.close();
+//                    } catch(Exception ex) {}
+//                    try {
+//                        os.close();
+//                    } catch(Exception ex) {}
+//                    try {
+//                        socket.close();
+//                    } catch(Exception ex) {}
+//                }
+//            }
+
 
             @Override
             public void run() {
@@ -109,5 +160,6 @@
                     }
                 }
             }
+
         }
     }

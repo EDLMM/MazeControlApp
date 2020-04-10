@@ -1,6 +1,7 @@
 package com.gongw.remote.search;
 
 import android.os.Build;
+import android.util.Log;
 
 import com.gongw.remote.RemoteConst;
 
@@ -57,14 +58,21 @@ public class DeviceSearchResponser {
                 DatagramPacket recePacket = new DatagramPacket(buf, buf.length);
                 openFlag = true;
                 while (openFlag) {
+                    Log.d("Remote","open searchResponse");
                     socket.receive(recePacket);
                     //校验数据包是否是搜索包
-                    if (verifySearchData(recePacket)) {
+//                    if (verifySearchData(recePacket)) {
+////                        //发送搜索应答包
+////                        byte[] sendData = packSearchRespData();
+////                        DatagramPacket sendPack = new DatagramPacket(sendData, sendData.length, recePacket.getSocketAddress());
+////                        socket.send(sendPack);
+////                    }
+//                    if (verifySearchData(recePacket)) {
                         //发送搜索应答包
                         byte[] sendData = packSearchRespData();
                         DatagramPacket sendPack = new DatagramPacket(sendData, sendData.length, recePacket.getSocketAddress());
                         socket.send(sendPack);
-                    }
+//                    }
                 }
             } catch (IOException e) {
                 destory();
@@ -81,6 +89,7 @@ public class DeviceSearchResponser {
          * @return
          */
         private byte[] packSearchRespData() {
+            Log.d("Remote","packSearchRespData");
             byte[] data = new byte[1024];
             int offset = 0;
             data[offset++] = RemoteConst.PACKET_PREFIX;

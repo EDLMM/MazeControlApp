@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.example.mazecontrol.Views.CustomView;
 import com.gongw.remote.Device;
+import com.gongw.remote.RemoteConst;
 import com.gongw.remote.communication.host.Command;
 import com.gongw.remote.communication.host.CommandSender;
 import com.gongw.remote.search.DeviceSearcher;
@@ -40,6 +41,11 @@ public class AdminHostActivity extends AppCompatActivity {
     @BindView(R.id.topbar)
     QMUITopBarLayout mTopBar;
 
+    // CustomView, i.e. random maze generation
+    private CustomView randomMazeGame;
+
+//    DeviceSearcher DeviceSearcher=new DeviceSearcher();
+
     private List<Device> deviceList = new ArrayList<>();
 //    private SimpleAdapter<Device> adapter;
 
@@ -48,21 +54,14 @@ public class AdminHostActivity extends AppCompatActivity {
         intent.putExtra("param1",data1);
         context.startActivity(intent);
     }
-    // to remote test
-    private ImageView iv_canvas;
-    private Bitmap baseBitmap;
-    private Canvas canvas;
-    private Paint paint;
 
-    // CustomView, i.e. random maze generation
-    private CustomView randomMazeGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         QMUIStatusBarHelper.translucent(this);
-        View root = LayoutInflater.from(this).inflate(R.layout.activity_show_maze, null);
+        View root = LayoutInflater.from(this).inflate(R.layout.activity_admin_host, null);
         ButterKnife.bind(this, root);
         initTopBar();
         setContentView(root);
@@ -73,18 +72,18 @@ public class AdminHostActivity extends AppCompatActivity {
 
     public void onClickReGenerateMaze(View view){
         randomMazeGame.onClickReGeneration();
-        Log.d("AdminHostActivity","onClickReGenerateMaze");
+        Log.d("Remote","onClickReGenerateMaze");
 
     }
 
     public void onClickSearchPlayer(View view){
-        Log.d("AdminHostActivity","onClickSearchPlayer");
+        Log.d("Remote","onClickSearchPlayer");
         // 搜索设备
         startSearch();
     }
 
     public void onClickSendAlert(View view){
-        Log.d("AdminHostActivity","onClickSendAlert");
+        Log.d("Remote","onClickSendAlert");
         // 搜索设备
         for(int i=0; i<deviceList.size(); i++){
             sendCommand(deviceList.get(i));
@@ -93,15 +92,7 @@ public class AdminHostActivity extends AppCompatActivity {
 
 
     private void initTopBar() {
-//        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                finish();
-////                overridePendingTransition(R.anim.slide_still, R.anim.slide_out_right);
-//            }
-//        });
-
-        mTopBar.setTitle("展示迷宫");
+        mTopBar.setTitle("管理员界面");
     }
 
     /**
@@ -114,11 +105,13 @@ public class AdminHostActivity extends AppCompatActivity {
 //                binding.srlRefreshLayout.setRefreshing(true);
                 Toast.makeText(AdminHostActivity.this, "管理端开始搜索玩家设备", Toast.LENGTH_SHORT).show();
                 deviceList.clear();
+//                deviceList.add(new Device("10.0.0.4", RemoteConst.DEVICE_SEARCH_PORT,"mi8"));
             }
 
             @Override
             public void onSearchedNewOne(Device device) {
 //                binding.srlRefreshLayout.setRefreshing(false);
+//                randomMazeGame.onClickReGeneration();
                 Toast.makeText(AdminHostActivity.this, "搜索到玩家设备", Toast.LENGTH_SHORT).show();
                 deviceList.add(device);
 //                adapter.notifyDataSetChanged();
@@ -129,19 +122,24 @@ public class AdminHostActivity extends AppCompatActivity {
 //                binding.srlRefreshLayout.setRefreshing(false);
 //                adapter.notifyDataSetChanged();
                 Toast.makeText(AdminHostActivity.this, "管理端完成搜索玩家设备", Toast.LENGTH_SHORT).show();
+                Log.d("Remote","finish searching, player list:");
+                for(int i=0; i<deviceList.size(); i++){
+                    Log.d("Remote",deviceList.get(i).getIp());
+                }
             }
         });
     }
 
     private void sendCommand(Device device){
         //发送命令，命令内容为"hello!"
-        Command command = new Command("Are you OK!", new Command.Callback() {
+        //UI接收网络层的相应
+        Command command = new Command("时间限时提醒", new Command.Callback() {
             @Override
             public void onRequest(String msg) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(AdminHostActivity.this, "Request: Are you OK!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AdminHostActivity.this, "已发送 时间限时提醒", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -151,7 +149,7 @@ public class AdminHostActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(AdminHostActivity.this, "Success:"+msg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AdminHostActivity.this, "玩家设备在线确认 "+msg, Toast.LENGTH_SHORT).show();
                     }
                 });
             }

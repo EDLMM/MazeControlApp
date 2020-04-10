@@ -43,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
         AdminHostActivity.actionStart(this,"start from mainAct");
     }
 
+    public void onClickPlayerSlaveActivity(View view){
+        PlayerSlaveActivity.actionStart(this,"start from mainAct");
+    }
+
     private void initTopBar() {
 //        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
 //            @Override
