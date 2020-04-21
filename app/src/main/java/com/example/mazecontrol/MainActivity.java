@@ -1,15 +1,19 @@
 package com.example.mazecontrol;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+
+
+import android.content.Context;
+import android.content.IntentFilter;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Toast;
+
 
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
+
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -17,6 +21,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
     @BindView(R.id.topbar) QMUITopBarLayout mTopBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
 //            Toast.makeText(this, "恢复到最近阅读(Boolean)", Toast.LENGTH_SHORT).show();
 //        }
 //        setContentView(R.layout.activity_main);
+
+
+
     }
 
     public void onClickShowMazeActivity(View view){

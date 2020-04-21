@@ -8,6 +8,7 @@ import com.gongw.remote.RemoteConst;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 /**
  * 用于响应局域网设备搜索
@@ -61,20 +62,17 @@ public class DeviceSearchResponser {
                     Log.d("Remote","open searchResponse");
                     socket.receive(recePacket);
                     //校验数据包是否是搜索包
-//                    if (verifySearchData(recePacket)) {
-////                        //发送搜索应答包
-////                        byte[] sendData = packSearchRespData();
-////                        DatagramPacket sendPack = new DatagramPacket(sendData, sendData.length, recePacket.getSocketAddress());
-////                        socket.send(sendPack);
-////                    }
-//                    if (verifySearchData(recePacket)) {
+                    if (verifySearchData(recePacket)) {
+                        Log.d("Remote","verify search response success");
                         //发送搜索应答包
                         byte[] sendData = packSearchRespData();
                         DatagramPacket sendPack = new DatagramPacket(sendData, sendData.length, recePacket.getSocketAddress());
                         socket.send(sendPack);
-//                    }
+                        // 只回应一次，然后关掉？
+                        sleep(3000);
+                    }
                 }
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 destory();
             }
         }
@@ -114,25 +112,33 @@ public class DeviceSearchResponser {
          * data - 数据内容
          */
         private boolean verifySearchData(DatagramPacket pack) {
-            if (pack.getLength() < 6) {
-                return false;
-            }
-
             byte[] data = pack.getData();
-            int offset = pack.getOffset();
-            int sendSeq;
-            if (data[offset++] != '$' || data[offset++] != RemoteConst.PACKET_TYPE_SEARCH_DEVICE_REQ) {
+            int length = pack.getLength();
+            InetAddress ip = pack.getAddress();
+            String content=new String(data,0,length);
+            int port =  pack.getPort();
+            Log.d("Remote",String.format("Searcher Responser receive: %s \n length: %d \n IP: %s",content,length,ip.toString()));
+            if (!content.equals(RemoteConst.ADMIN_SEARCHER_ID)){
                 return false;
+            }else{
+                return true;
             }
-            sendSeq = data[offset++] & 0xFF;
-            sendSeq |= (data[offset++] << 8) & 0xFF00;
-            sendSeq |= (data[offset++] << 16) & 0xFF0000;
-            sendSeq |= (data[offset++] << 24) & 0xFF000000;
-            if (sendSeq < 1 || sendSeq > RemoteConst.SEARCH_DEVICE_TIMES) {
-                return false;
-            }
-
-            return true;
+//            if (pack.getLength() < 6) {
+//                return false;
+//            }
+//            byte[] data = pack.getData();
+//            int offset = pack.getOffset();
+//            int sendSeq;
+//            if (data[offset++] != '$' || data[offset++] != RemoteConst.PACKET_TYPE_SEARCH_DEVICE_REQ) {
+//                return false;
+//            }
+//            sendSeq = data[offset++] & 0xFF;
+//            sendSeq |= (data[offset++] << 8) & 0xFF00;
+//            sendSeq |= (data[offset++] << 16) & 0xFF0000;
+//            sendSeq |= (data[offset++] << 24) & 0xFF000000;
+//            if (sendSeq < 1 || sendSeq > RemoteConst.SEARCH_DEVICE_TIMES) {
+//                return false;
+//            }
         }
 
         /**

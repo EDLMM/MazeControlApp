@@ -59,9 +59,8 @@ public class PlayerSlaveActivity extends AppCompatActivity {
             //停止响应搜索
             DeviceSearchResponser.close();
             isOpen = false;
-//            binding.btnOpenResponser.setText("打开应答");
             //停止接收通信命令
-            CommandReceiver.close();
+//            CommandReceiver.close();
 //            Toast.makeText(PlayerSlaveActivity.this, "已经关闭响应程序！", Toast.LENGTH_SHORT).show();
             Toast.makeText(PlayerSlaveActivity.this, "已经关闭游戏连线！", Toast.LENGTH_SHORT).show();
         }else{
@@ -70,23 +69,23 @@ public class PlayerSlaveActivity extends AppCompatActivity {
             isOpen = true;
 //            binding.btnOpenResponser.setText("关闭应答");
             //开始接受通信命令
-            CommandReceiver.open(new CommandReceiver.CommandListener() {
-                // 通过这个 interface 把网络层反馈的string传递出来
-                @Override
-                public String onReceive(final String msg) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(PlayerSlaveActivity.this, "来自管理端 "+msg, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    return CommunicationKey.RESPONSE_OK +
-                            "OK" +
-                            CommunicationKey.EOF;
-                }
-            });
-            Toast.makeText(PlayerSlaveActivity.this, "已经打开游戏连线！", Toast.LENGTH_SHORT).show();
-//            Toast.makeText(PlayerSlaveActivity.this, "已经打开响应程序！", Toast.LENGTH_SHORT).show();
+//            CommandReceiver.open(new CommandReceiver.CommandListener() {
+//                // 通过这个 interface 把网络层反馈的string传递出来
+//                @Override
+//                public String onReceive(final String msg) {
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(PlayerSlaveActivity.this, "来自管理端 "+msg, Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//                    return CommunicationKey.RESPONSE_OK +
+//                            "OK" +
+//                            CommunicationKey.EOF;
+//                }
+//            });
+//            Toast.makeText(PlayerSlaveActivity.this, "已经打开游戏连线！", Toast.LENGTH_SHORT).show();
+            Toast.makeText(PlayerSlaveActivity.this, "已经打开响应程序！", Toast.LENGTH_SHORT).show();
         }
     }
 }

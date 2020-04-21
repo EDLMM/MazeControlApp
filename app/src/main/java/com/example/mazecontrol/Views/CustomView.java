@@ -221,8 +221,12 @@ public class CustomView extends View {
     }
 
     private void checkSuccess(){
-        if(player==exit && gold_num_record<=0)
+        if(player==exit && gold_num_record<=0) {
+            gold_num_record=GOLD_NUM;
             createMaze();
+        }
+
+
     }
 
     @Override

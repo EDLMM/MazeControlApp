@@ -79,6 +79,7 @@ public class AdminHostActivity extends AppCompatActivity {
     public void onClickSearchPlayer(View view){
         Log.d("Remote","onClickSearchPlayer");
         // 搜索设备
+        // BUG 华为手机作为管理端无法搜索到小米手机，小米手机可以做管理端
         startSearch();
     }
 
@@ -105,7 +106,7 @@ public class AdminHostActivity extends AppCompatActivity {
 //                binding.srlRefreshLayout.setRefreshing(true);
                 Toast.makeText(AdminHostActivity.this, "管理端开始搜索玩家设备", Toast.LENGTH_SHORT).show();
                 deviceList.clear();
-//                deviceList.add(new Device("10.0.0.4", RemoteConst.DEVICE_SEARCH_PORT,"mi8"));
+//                deviceList.add(new Device("10.0.0.8", RemoteConst.DEVICE_SEARCH_PORT,"mi8"));
             }
 
             @Override

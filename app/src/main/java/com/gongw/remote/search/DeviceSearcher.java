@@ -2,6 +2,7 @@ package com.gongw.remote.search;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.gongw.remote.Device;
 import com.gongw.remote.RemoteConst;
@@ -30,21 +31,21 @@ public class DeviceSearcher {
 	public static void search(OnSearchListener onSearchListener){
 		executorService.execute(new SearchRunnable(onSearchListener));
 	}
-	
+
 	public static interface OnSearchListener{
 		void onSearchStart();
 		void onSearchedNewOne(Device device);
 		void onSearchFinish();
 	}
-	
+
 	private static class SearchRunnable implements Runnable {
-		
+
 		OnSearchListener searchListener;
-		
+
 		public SearchRunnable(OnSearchListener listener){
 			this.searchListener = listener;
 		}
-		
+
 		@Override
 		public void run() {
 			try {
@@ -61,26 +62,31 @@ public class DeviceSearcher {
 				socket.setSoTimeout(RemoteConst.RECEIVE_TIME_OUT);
 				byte[] sendData = new byte[1024];
 				byte[] receData = new byte[1024];
-                DatagramPacket recePack = new DatagramPacket(receData, receData.length);
-                //使用广播形式（目标地址设为255.255.255.255）的udp数据包
-                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), RemoteConst.DEVICE_SEARCH_PORT);
-                //用于存放已经应答的设备
-                HashMap<String, Device> devices = new HashMap<>();
-                //搜索指定次数
+				DatagramPacket recePack = new DatagramPacket(receData, receData.length);
+				//使用广播形式（目标地址设为255.255.255.255）的udp数据包
+				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), RemoteConst.DEVICE_SEARCH_PORT);
+				//用于存放已经应答的设备
+				HashMap<String, Device> devices = new HashMap<>();
+				String s = new String(RemoteConst.ADMIN_SEARCHER_ID);
+				byte[] data = s.getBytes();
+				//搜索指定次数
 				for(int i=0;i<RemoteConst.SEARCH_DEVICE_TIMES;i++){
-					sendPacket.setData(packSearchData(i+1));
+//					sendPacket.setData(packSearchData(i+1));
+					sendPacket.setData(data);
 					//发送udp数据包
 					socket.send(sendPacket);
-	                try {
-	                	//限定搜索设备的最大数量
-	                    int rspCount = RemoteConst.SEARCH_DEVICE_MAX;
-	                    while (rspCount > 0) {
-	                        socket.receive(recePack);
-	                        final Device device = parseRespData(recePack);
-	                        if(devices.get(device.getIp())==null){
-	                        	//保存新应答的设备
-		                        devices.put(device.getIp(), device);
+					try {
+						//限定搜索设备的最大数量
+						int rspCount = RemoteConst.SEARCH_DEVICE_MAX;
+						while (rspCount > 0) {
+							socket.receive(recePack);
+							final Device device = parseRespData(recePack);
+							if(devices.get(device.getIp())==null){
+								//保存新应答的设备
+								Log.d("Remote",String.format("add new device with UUID: %s",device.getUuid()));
+								devices.put(device.getIp(), device);
 								if(searchListener!=null){
+									Log.d("Remote","get search response");
 									uiHandler.post(new Runnable() {
 										@Override
 										public void run() {
@@ -88,11 +94,11 @@ public class DeviceSearcher {
 										}
 									});
 								}
-	                        }
+							}
 							rspCount --;
-	                    }
-	                } catch (SocketTimeoutException e) {
-	                }
+						}
+					} catch (SocketTimeoutException e) {
+					}
 				}
 				socket.close();
 				if(searchListener!=null){
@@ -108,37 +114,38 @@ public class DeviceSearcher {
 			}
 		}
 
-        /**
-         * 校验和解析应答的数据包
+		/**
+		 * 校验和解析应答的数据包
 		 * @param pack udp数据包
 		 * @return
-         */
+		 */
 		private Device parseRespData(DatagramPacket pack) {
+			byte[] data = pack.getData();
+			int offset = pack.getOffset();
 			if (pack.getLength() < 2) {
-	            return null;
-	        }
-	        byte[] data = pack.getData();
-	        int offset = pack.getOffset();
-	        //检验数据包格式是否符合要求
-	        if (data[offset++] != RemoteConst.PACKET_PREFIX || data[offset++] != RemoteConst.PACKET_TYPE_SEARCH_DEVICE_RSP) {
-	            return null;
-	        }
-	        int length = data[offset++];
-        	String uuid = new String(data, offset, length);
+				return null;
+			}
+			//检验数据包格式是否符合要求
+			if (data[offset++] != RemoteConst.PACKET_PREFIX || data[offset++] != RemoteConst.PACKET_TYPE_SEARCH_DEVICE_RSP) {
+				return null;
+			}
+			int length = data[offset++];
+			String uuid = new String(data, offset, length);
 			return new Device(pack.getAddress().getHostAddress(), pack.getPort(), uuid);
 		}
 
 		/**
-         * 生成搜索数据包
+		 * 生成搜索数据包
 		 * 格式：$(1) + packType(1) + sendSeq(4) + dataLen(1) + [data]
 		 *  packType - 报文类型
 		 *  sendSeq - 发送序列
 		 *  dataLen - 数据长度
 		 *  data - 数据内容
 		 * @param seq
-         * @return
-         */
+		 * @return
+		 */
 		private byte[] packSearchData(int seq) {
+
 			byte[] data = new byte[6];
 			int offset = 0;
 			data[offset++] = RemoteConst.PACKET_PREFIX;
@@ -147,6 +154,7 @@ public class DeviceSearcher {
 			data[offset++] = (byte) (seq >> 8);
 			data[offset++] = (byte) (seq >> 16);
 			data[offset++] = (byte) (seq >> 24);
+
 			return data;
 		}
 	}

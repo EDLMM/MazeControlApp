@@ -5,7 +5,12 @@ package com.gongw.remote.communication.host;
  */
 import com.example.mazecontrol.Views.CellGroup;
 
-public class Command {
+import java.io.Serializable;
+
+import static com.gongw.remote.RemoteConst.CommandClassSerialID;
+
+public class Command implements Serializable {
+    private static final long serialVersionUID = CommandClassSerialID;
     private String destIp;
     private String content;
     private Callback callback;
