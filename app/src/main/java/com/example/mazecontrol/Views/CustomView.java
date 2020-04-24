@@ -15,12 +15,14 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Stack;
 
 import com.example.mazecontrol.Views.Cell;
 import com.example.mazecontrol.Views.CellGroup;
+import com.remote.UDPConstant;
 
 // 定义了多种创建类的初始化方法，应对不同的情况
 public class CustomView extends View {
@@ -395,8 +397,11 @@ public class CustomView extends View {
             next.leftWall=false;
         }
     }
-
+    public void setTopologyByCellGroup(CellGroup cg){
+        player = cg.player;
+        cells = cg.cells;
+    }
     public CellGroup getCells(){
-        return new CellGroup(cells,COLS,ROWS);
+        return new CellGroup(cells,player,COLS,ROWS);
     }
 }

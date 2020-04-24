@@ -16,7 +16,7 @@ import java.net.InetAddress;
 public class DeviceSearchResponser {
 
     private static SearchRespThread searchRespThread;
-
+    public static String AdminIP;
     /**
      * 启动响应线程，收到设备搜索命令后，自动响应
      */
@@ -67,6 +67,7 @@ public class DeviceSearchResponser {
                         //发送搜索应答包
                         byte[] sendData = packSearchRespData();
                         DatagramPacket sendPack = new DatagramPacket(sendData, sendData.length, recePacket.getSocketAddress());
+                        AdminIP = new String(recePacket.getSocketAddress().toString());
                         socket.send(sendPack);
                         // 只回应一次，然后关掉？
                         sleep(3000);

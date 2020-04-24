@@ -7,6 +7,8 @@ import android.util.AttributeSet;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import java.io.Serializable;
+
 public class HostMazeView extends CustomView {
 
     public HostMazeView(Context context) {

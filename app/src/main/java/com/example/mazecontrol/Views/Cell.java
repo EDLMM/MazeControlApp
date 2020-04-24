@@ -1,6 +1,8 @@
 package com.example.mazecontrol.Views;
 
-public class Cell {
+import java.io.Serializable;
+
+public class Cell implements Serializable {
     boolean
             topWall = true,
             leftWall = true,
@@ -13,5 +15,16 @@ public class Cell {
     public Cell(int col, int row){
         this.col=col;
         this.row=row;
+    }
+
+    public Cell(Cell cell) {
+        col=cell.col;
+        row=cell.row;
+        topWall=cell.topWall;
+        leftWall = cell.leftWall;
+        rightWall = cell.rightWall;
+        bottomWall = cell.bottomWall;
+        visited = cell.visited; // only for creation
+        placeGold = cell.placeGold;
     }
 }
