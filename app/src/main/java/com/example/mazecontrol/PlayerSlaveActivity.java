@@ -81,7 +81,7 @@ public class PlayerSlaveActivity extends AppCompatActivity {
         try
         {
             IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(UDPConstant.RECEIVE_UPDATE_BROADCAST_ACTION);
+            intentFilter.addAction(UDPConstant.RECEIVE_TOPOLOGY_UPDATE_BROADCAST_ACTION);
             registerReceiver(myBroadCastReceiver, intentFilter);
         }
         catch (Exception ex)

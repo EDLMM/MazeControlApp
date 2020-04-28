@@ -11,6 +11,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.example.mazecontrol.Views.CellGroup;
+import com.example.mazecontrol.Views.Spot_Location;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -23,13 +24,21 @@ import java.net.MulticastSocket;
 public class MultiCastServiceReceive extends IntentService {
 
     private static final String TAG = "Remote";
+    private int startId;
+
+    // for topology
     private static WorkThread workThread = null;
     private boolean isScoketOpen=false;
     private MulticastSocket mSocket;
     private InetAddress mAddress;
-    private int startId;
-
     private CellGroup cellGroup=null;
+
+    // for location
+    private static WorkThread_Location workThread_location;
+    private boolean isScoketOpen_location=false;
+    private MulticastSocket mSocket_location;
+    private InetAddress mAddress_location;
+    private Spot_Location spot_location=null;
 
     public MultiCastServiceReceive(){
         super(MultiCastServiceReceive.class.getSimpleName());
@@ -67,10 +76,15 @@ public class MultiCastServiceReceive extends IntentService {
             return true;
         }
     }
+
+    public void setServiceSpotLocation(Spot_Location spotFromView){spot_location=spotFromView;}
+
+
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.d(TAG,"handle intent func");
         sendCellUpdateBroadCast();
+        sendSpotLocationUpdateBroadCast();
     }
 
     /**
@@ -81,7 +95,23 @@ public class MultiCastServiceReceive extends IntentService {
         {
             Log.d(TAG,"sendCellUpdateBroadCast()");
             Intent broadCastIntent = new Intent();
-            broadCastIntent.setAction(UDPConstant.RECEIVE_UPDATE_BROADCAST_ACTION);
+            broadCastIntent.setAction(UDPConstant.RECEIVE_TOPOLOGY_UPDATE_BROADCAST_ACTION);
+
+            // uncomment this line if you want to send data
+//            broadCastIntent.putExtra("data", "abc");
+            sendBroadcast(broadCastIntent);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+    private void sendSpotLocationUpdateBroadCast() {
+        try
+        {
+            Log.d(TAG,"sendSpotLocationUpdateBroadCast()");
+            Intent broadCastIntent = new Intent();
+            broadCastIntent.setAction(UDPConstant.RECEIVE_LOCATION_UPDATE_BROADCAST_ACTION);
 
             // uncomment this line if you want to send data
 //            broadCastIntent.putExtra("data", "abc");
@@ -147,11 +177,32 @@ public class MultiCastServiceReceive extends IntentService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //开始下载
+        //开始接收
         if (workThread == null) {
             Log.d(TAG, "MultiCastServiceReceive start listen");
             workThread = new WorkThread();
             workThread.start();
+        }
+        // --------------------
+        isScoketOpen_location=true;
+        try {
+            mAddress_location = InetAddress.getByName(UDPConstant.IP_ADDRESS);
+
+            if (!mAddress_location.isMulticastAddress()) {
+//                throw new NoMulticastException();
+                Log.i(TAG, "run: " + "NOT MULTICAST ADDRESS!");
+            }
+            mSocket_location = new MulticastSocket(UDPConstant.LOCATION_PORT);
+            mSocket_location.setTimeToLive(UDPConstant.TTLTIME);
+            mSocket_location.joinGroup(mAddress_location);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //开始接收
+        if (workThread_location == null) {
+            Log.d(TAG, "MultiCastServiceReceive start listen");
+            workThread_location = new WorkThread_Location();
+            workThread_location.start();
         }
     }
     /**
@@ -160,12 +211,18 @@ public class MultiCastServiceReceive extends IntentService {
     public void stopReceive() {
         Log.d(TAG, "stopReceive()");
         isScoketOpen=false;
-        //获取进度
         mSocket.close();
         if (workThread != null) {
             Log.d(TAG, "MultiCastServiceReceive stop listen");
             workThread.destory();
             workThread = null;
+        }
+        isScoketOpen_location=false;
+        mSocket_location.close();
+        if (workThread_location != null) {
+            Log.d(TAG, "MultiCastServiceReceive stop listen");
+            workThread_location.destory();
+            workThread_location = null;
         }
         stopSelf(startId);
     }
@@ -188,6 +245,33 @@ public class MultiCastServiceReceive extends IntentService {
                     Log.d(TAG, "receive: " + result);
                     // 让 activity 更新 view
                     sendCellUpdateBroadCast();
+                } catch (IOException | ClassNotFoundException e) {
+                    Log.d(TAG, "IOException | ClassNotFoundException");
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public void destory() {
+            this.interrupt();
+        }
+    }
+    private class WorkThread_Location extends Thread {
+
+        @Override
+        public void run() {
+            byte[] buffer = new byte[UDPConstant.SPOT_LOCATION_SERIALIZABLE_BUF];
+            DatagramPacket datagramPacket = new DatagramPacket(buffer, UDPConstant.SPOT_LOCATION_SERIALIZABLE_BUF);
+            while (isScoketOpen_location) {
+                try {
+                    mSocket_location.receive(datagramPacket);
+                    ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(buffer));
+                    spot_location = (Spot_Location) iStream.readObject();
+                    iStream.close();
+                    String result = spot_location.getP_id();
+                    Log.d(TAG, "receive: " + result);
+                    // 让 activity 更新 view
+                    sendSpotLocationUpdateBroadCast();
                 } catch (IOException | ClassNotFoundException e) {
                     Log.d(TAG, "IOException | ClassNotFoundException");
                     e.printStackTrace();
