@@ -34,12 +34,14 @@ public class MultiCastServiceSend extends Service {
     private MulticastSocket mSocket;
     private InetAddress mAddress;
     private CellGroup cellGroup=null;
+    private boolean isTopologyChanged=false;
 
     //for location
     private static WorkThread_Location workThread_location;
     private MulticastSocket mSocket_location;
     private InetAddress mAddress_location;
     private Spot_Location spot_location=null;
+    private boolean isLocationChanged=false;
 
     public MultiCastServiceSend(){
 
@@ -73,6 +75,8 @@ public class MultiCastServiceSend extends Service {
     public CellGroup getServiceCellGroup(){
         return cellGroup;
     }
+    public void setIsTopologyChangedTrue(){ isTopologyChanged=true;}
+    public void setIsLocationChangedTrue(){ isLocationChanged=true;}
     public void setServiceCellGroup(CellGroup cellsFromView){
         cellGroup = cellsFromView;
     }
@@ -194,22 +198,25 @@ public class MultiCastServiceSend extends Service {
             try {
                     Log.d(TAG, "MultiCastServiceSend Sending");
                     while (true) {
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();//程序内部创建一个byte型别数组的缓冲区，然后利用ByteArrayOutputStream和ByteArrayInputStream的实例向数组中写入或读出byte型数据
-                        ObjectOutputStream oos = null;
-                        cellGroup.message = "Message: " + Integer.toString(getRandomNumber());
-                        try {
-                            oos = new ObjectOutputStream(bos);
-                            oos.writeObject(cellGroup);
-                        //                oos.flush();
-                            oos.close(); //从内存中直接释放，因为下次还要new
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        if(isTopologyChanged) {
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();//程序内部创建一个byte型别数组的缓冲区，然后利用ByteArrayOutputStream和ByteArrayInputStream的实例向数组中写入或读出byte型数据
+                            ObjectOutputStream oos = null;
+                            cellGroup.message = "Message: " + Integer.toString(getRandomNumber());
+                            try {
+                                oos = new ObjectOutputStream(bos);
+                                oos.writeObject(cellGroup);
+                                //                oos.flush();
+                                oos.close(); //从内存中直接释放，因为下次还要new
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            Log.d(TAG, "cell Group 序列化后字节数：" + bos.toByteArray().length);
+                            byte[] data = bos.toByteArray();       //转化为字节数组
+                            datagramPacket = new DatagramPacket(data, data.length, mAddress, UDPConstant.PORT);
+                            mSocket.send(datagramPacket);
+                            Log.i(TAG, "send: " + cellGroup.message + " to " + mAddress.getHostAddress());
                         }
-                        Log.d(TAG,"cell Gruop 序列化后字节数：" + bos.toByteArray().length);
-                        byte[] data = bos.toByteArray();       //转化为字节数组
-                        datagramPacket = new DatagramPacket(data, data.length, mAddress, UDPConstant.PORT);
-                        mSocket.send(datagramPacket);
-                        Log.i(TAG, "send: " + cellGroup.message + " to " + mAddress.getHostAddress());
+                        isTopologyChanged=false;
                         Thread.sleep(UDPConstant.SEND_VIEW_UPDATA_INTERVAL_MS );
                     }
                 } catch (IOException | InterruptedException e) {
@@ -228,21 +235,24 @@ public class MultiCastServiceSend extends Service {
             try {
                 Log.d(TAG, "MultiCastServiceSend location Sending");
                 while (true) {
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();//程序内部创建一个byte型别数组的缓冲区，然后利用ByteArrayOutputStream和ByteArrayInputStream的实例向数组中写入或读出byte型数据
-                    ObjectOutputStream oos = null;
-                    try {
-                        oos = new ObjectOutputStream(bos);
-                        oos.writeObject(spot_location);
-                        //                oos.flush();
-                        oos.close(); //从内存中直接释放，因为下次还要new
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if(isLocationChanged){
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();//程序内部创建一个byte型别数组的缓冲区，然后利用ByteArrayOutputStream和ByteArrayInputStream的实例向数组中写入或读出byte型数据
+                        ObjectOutputStream oos = null;
+                        try {
+                            oos = new ObjectOutputStream(bos);
+                            oos.writeObject(spot_location);
+                            //                oos.flush();
+                            oos.close(); //从内存中直接释放，因为下次还要new
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d(TAG,"spot Location 序列化后字节数：" + bos.toByteArray().length);
+                        byte[] data = bos.toByteArray();       //转化为字节数组
+                        datagramPacket = new DatagramPacket(data, data.length, mAddress_location, UDPConstant.LOCATION_PORT);
+                        mSocket_location.send(datagramPacket);
+                        Log.i(TAG, Integer.toString(getRandomNumber()) + "send Spot name:" + spot_location.getP_id() + " to " + mAddress_location.getHostAddress());
                     }
-                    Log.d(TAG,"spot Location 序列化后字节数：" + bos.toByteArray().length);
-                    byte[] data = bos.toByteArray();       //转化为字节数组
-                    datagramPacket = new DatagramPacket(data, data.length, mAddress_location, UDPConstant.LOCATION_PORT);
-                    mSocket_location.send(datagramPacket);
-                    Log.i(TAG, Integer.toString(getRandomNumber()) + "send Spot name:" + spot_location.getP_id() + " to " + mAddress_location.getHostAddress());
+                    isLocationChanged=false;
                     Thread.sleep(UDPConstant.SEND_LOCATION_UPDATA_INTERVAL_MS );
                 }
             } catch (IOException | InterruptedException e) {

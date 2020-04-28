@@ -70,15 +70,18 @@ public class MultiCastServiceReceive extends IntentService {
     public void setServiceCellGroup(CellGroup cellsFromView){
         cellGroup = cellsFromView;
     }
-    public boolean isCellGroupInitialized(){
-        if (cellGroup == null){
-            return false;
-        }else{
-            return true;
-        }
+    public boolean isCellGroupNotNull(){
+        return (cellGroup != null) ;
     }
 
+
+    public Spot_Location getServiceSpotLocation(){return spot_location;}
     public void setServiceSpotLocation(Spot_Location spotFromView){spot_location=spotFromView;}
+    public boolean isSpotLocationNotNull(){
+        return (spot_location != null) ;
+    }
+
+
 
 
     @Override
@@ -251,7 +254,7 @@ public class MultiCastServiceReceive extends IntentService {
                     cellGroup = (CellGroup) iStream.readObject();
                     iStream.close();
                     String result = cellGroup.message ;
-                    Log.d(TAG, "receive: " + result);
+                    Log.d(TAG, "receive TOPO: " + result);
                     // 让 activity 更新 view
                     sendCellUpdateBroadCast();
                 } catch (IOException | ClassNotFoundException e) {
@@ -277,8 +280,8 @@ public class MultiCastServiceReceive extends IntentService {
                     ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(buffer));
                     spot_location = (Spot_Location) iStream.readObject();
                     iStream.close();
-                    @SuppressLint("DefaultLocale") String result = String.format("id: %s, col: %d, row: %d",spot_location.getP_id(),spot_location.getLocationCol(),spot_location.getLocationRow());
-                    Log.d(TAG, "receive: " + result);
+                    String result = String.format("id: %s, col: %d, row: %d",spot_location.getP_id(),spot_location.getLocationCol(),spot_location.getLocationRow());
+                    Log.d(TAG, "receive LOCA: " + result);
                     // 让 activity 更新 view
                     sendSpotLocationUpdateBroadCast();
                 } catch (IOException | ClassNotFoundException e) {

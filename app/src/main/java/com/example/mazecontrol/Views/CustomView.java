@@ -413,12 +413,14 @@ public class CustomView extends View {
         player = cg.player;
         cells = cg.cells;
     }
-    public void setPlayerByCellGroup(CellGroup cg){
-
+    public void setTopoByCellGroup(CellGroup cg){
+        cells = cg.cells;
     }
-    public void setWallByCellGroup(CellGroup cg){
-
+    public void setLocaBySpotLocation(Spot_Location sp){
+        Log.d("Remote", "update adimn view");
+        player= cells[sp.getLocationCol()][sp.getLocationRow()];
     }
+
 
     public CellGroup getCells(){
         return new CellGroup(cells,player,COLS,ROWS);
