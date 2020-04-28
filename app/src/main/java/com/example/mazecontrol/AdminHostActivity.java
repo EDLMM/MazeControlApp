@@ -6,11 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
+
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -25,7 +21,7 @@ import android.widget.Toast;
 import com.example.mazecontrol.Views.CustomView;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
-import com.remote.MazeTopoCommand;
+
 import com.remote.MultiCastServiceSend;
 import com.remote.UDPConstant;
 
@@ -45,7 +41,8 @@ public class AdminHostActivity extends AppCompatActivity {
 
     // CustomView, i.e. random maze generation
     private CustomView randomMazeGame;
-    private MazeTopoCommand mazeCommand = new MazeTopoCommand();
+
+    private static String device_id="admin_device";
 
     //用于单次发送
     private MulticastSocket mSocket;
@@ -89,6 +86,7 @@ public class AdminHostActivity extends AppCompatActivity {
                     // However, if this call were something that might hang, then this request should
                     // occur in a separate thread to avoid slowing down the activity performance.
                     mService.setServiceCellGroup(randomMazeGame.getCells());
+                    mService.setServiceSpotLocation(randomMazeGame.getSelfSpotLocation(device_id));
                 }
                 return false;
             }
@@ -123,7 +121,6 @@ public class AdminHostActivity extends AppCompatActivity {
         Log.d("Remote","onClick Send one message");
         // 搜索设备
         new SendThread().start();
-
     }
 
 
@@ -183,18 +180,18 @@ public class AdminHostActivity extends AppCompatActivity {
     private void startSendService(){
         Intent intent = new Intent(this, MultiCastServiceSend.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("Key", UDPConstant.Control.PLAY);
+        bundle.putSerializable("Key", UDPConstant.Control.TOPO_START);
         intent.putExtras(bundle);
         startService(intent);
     }
     private void stopSendService() {
-//        Intent intent = new Intent(this, MultiCastServiceSend.class);
-//        Bundle bundle = new Bundle();
-//        bundle.putSerializable("Key", UDPConstant.Control.STOP);
-//        intent.putExtras(bundle);
-//        startService(intent);
         Intent intent = new Intent(this, MultiCastServiceSend.class);
-        stopService(intent);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("Key", UDPConstant.Control.TOPO_STOP);
+        intent.putExtras(bundle);
+        startService(intent);
+//        Intent intent = new Intent(this, MultiCastServiceSend.class);
+//        stopService(intent);
     }
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection connection = new ServiceConnection() {
@@ -208,6 +205,7 @@ public class AdminHostActivity extends AppCompatActivity {
             mBound = true;
             // initialize the cell group in background service
             mService.setServiceCellGroup(randomMazeGame.getCells());
+            mService.setServiceSpotLocation(randomMazeGame.getSelfSpotLocation(device_id));
         }
 
         @Override

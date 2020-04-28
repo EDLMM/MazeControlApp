@@ -68,7 +68,6 @@ public class PlayerSlaveActivity extends AppCompatActivity {
             WifiManager.MulticastLock lock = wifi.createMulticastLock("mylock");
             lock.acquire();
         }
-
         myBroadCastReceiver = new MyBroadCastReceiver();
         registerMyReceiver();
     }
@@ -136,7 +135,7 @@ public class PlayerSlaveActivity extends AppCompatActivity {
     private void startReceiveService(){
         Intent intent = new Intent(this, MultiCastServiceReceive.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("Key", UDPConstant.Control.PLAY);
+        bundle.putSerializable("Key", UDPConstant.Control.TOPO_START);
         intent.putExtras(bundle);
         startService(intent);
     }
@@ -144,7 +143,7 @@ public class PlayerSlaveActivity extends AppCompatActivity {
     private void stopReceiveService() {
         Intent intent = new Intent(this, MultiCastServiceReceive.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("Key", UDPConstant.Control.STOP);
+        bundle.putSerializable("Key", UDPConstant.Control.TOPO_STOP);
         intent.putExtras(bundle);
         startService(intent);
 //        Intent intent = new Intent(this, MultiCastServiceReceive.class);

@@ -7,12 +7,12 @@ import java.io.Serializable;
 // can be adapted to for further use
 public class Spot_Location implements Serializable {
     private String p_id;
-    private int locationCol,locationRow;
+    private int locationCol = 0,locationRow= 0;
 
-    Spot_Location(String p_id){
+    Spot_Location(String p_id,int c, int r){
         this.p_id=p_id;
-        locationCol = 0;
-        locationRow= 0;
+        locationCol = c;
+        locationRow= r;
     }
 
     public void setLocationCol(int locationCol) {

@@ -1,5 +1,6 @@
 package com.remote;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
@@ -138,14 +139,17 @@ public class MultiCastServiceReceive extends IntentService {
             UDPConstant.Control control = (UDPConstant.Control) bundle.getSerializable("Key");
             if (control != null) {
                 switch (control) {
-                    case PLAY:
+                    case TOPO_START:
                         startReceive();
                         break;
-                    case UPDATE:
-                        break;
-                    case STOP:
+                    case TOPO_STOP:
                         stopReceive() ;
                         break;
+                    case LOCA_START:
+                        startReceive_Location();
+                        break;
+                    case LOCA_STOP:
+                        stopReceive_Location();
                 }
             }
         }
@@ -177,16 +181,17 @@ public class MultiCastServiceReceive extends IntentService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //开始接收
         if (workThread == null) {
             Log.d(TAG, "MultiCastServiceReceive start listen");
             workThread = new WorkThread();
             workThread.start();
         }
+    }
+    public void startReceive_Location(){
         // --------------------
         isScoketOpen_location=true;
         try {
-            mAddress_location = InetAddress.getByName(UDPConstant.IP_ADDRESS);
+            mAddress_location = InetAddress.getByName(UDPConstant.IP_ADDRESS_LOCATION);
 
             if (!mAddress_location.isMulticastAddress()) {
 //                throw new NoMulticastException();
@@ -204,6 +209,7 @@ public class MultiCastServiceReceive extends IntentService {
             workThread_location = new WorkThread_Location();
             workThread_location.start();
         }
+
     }
     /**
      * 停止响应
@@ -217,6 +223,10 @@ public class MultiCastServiceReceive extends IntentService {
             workThread.destory();
             workThread = null;
         }
+        stopSelf(startId);
+    }
+    public void stopReceive_Location(){
+        Log.d(TAG, "stopReceive()");
         isScoketOpen_location=false;
         mSocket_location.close();
         if (workThread_location != null) {
@@ -226,7 +236,6 @@ public class MultiCastServiceReceive extends IntentService {
         }
         stopSelf(startId);
     }
-
 
     private class WorkThread extends Thread {
 
@@ -246,7 +255,7 @@ public class MultiCastServiceReceive extends IntentService {
                     // 让 activity 更新 view
                     sendCellUpdateBroadCast();
                 } catch (IOException | ClassNotFoundException e) {
-                    Log.d(TAG, "IOException | ClassNotFoundException");
+                    Log.d(TAG, "IOException | ClassNotFoundException for topology");
                     e.printStackTrace();
                 }
             }
@@ -268,12 +277,12 @@ public class MultiCastServiceReceive extends IntentService {
                     ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(buffer));
                     spot_location = (Spot_Location) iStream.readObject();
                     iStream.close();
-                    String result = spot_location.getP_id();
+                    @SuppressLint("DefaultLocale") String result = String.format("id: %s, col: %d, row: %d",spot_location.getP_id(),spot_location.getLocationCol(),spot_location.getLocationRow());
                     Log.d(TAG, "receive: " + result);
                     // 让 activity 更新 view
                     sendSpotLocationUpdateBroadCast();
                 } catch (IOException | ClassNotFoundException e) {
-                    Log.d(TAG, "IOException | ClassNotFoundException");
+                    Log.d(TAG, "IOException | ClassNotFoundException for location");
                     e.printStackTrace();
                 }
             }

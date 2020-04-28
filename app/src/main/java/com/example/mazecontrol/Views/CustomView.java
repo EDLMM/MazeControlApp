@@ -423,4 +423,5 @@ public class CustomView extends View {
     public CellGroup getCells(){
         return new CellGroup(cells,player,COLS,ROWS);
     }
+    public Spot_Location getSelfSpotLocation(String device_id) {return new Spot_Location(device_id,player.col,player.row);}
 }

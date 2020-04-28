@@ -92,14 +92,17 @@ public class MultiCastServiceSend extends Service {
             UDPConstant.Control control = (UDPConstant.Control) bundle.getSerializable("Key");
             if (control != null) {
                 switch (control) {
-                    case PLAY:
+                    case TOPO_START:
                         startSend();
                         break;
-                    case UPDATE:
-                        break;
-                    case STOP:
+                    case TOPO_STOP:
                         stopSend() ;
                         break;
+                    case LOCA_START:
+                        startSend_Location();
+                        break;
+                    case LOCA_STOP:
+                        stopSend_Location();
                 }
             }
         }
@@ -119,16 +122,32 @@ public class MultiCastServiceSend extends Service {
         try {
             Log.e(TAG, "onCreate set socket");
             mAddress = InetAddress.getByName(UDPConstant.IP_ADDRESS);
-            mAddress_location = InetAddress.getByName(UDPConstant.IP_ADDRESS);
-
             if (!mAddress.isMulticastAddress()) {
 //                throw new NoMulticastException();
                 Log.i(TAG, "run: " + "NOT MULTICAST ADDRESS!");
             }
-
             mSocket = new MulticastSocket(UDPConstant.PORT);
             mSocket.setTimeToLive(UDPConstant.TTLTIME);
 //            mSocket.joinGroup(mAddress);
+            //仅仅创建
+//            new WorkThread().start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (workThread == null) {
+            Log.d(TAG, "MultiCastServiceSend start");
+            workThread = new WorkThread();
+            workThread.start();
+        }
+    }
+    public void startSend_Location() {
+        try {
+            Log.e(TAG, "onCreate set socket for location");
+            mAddress_location = InetAddress.getByName(UDPConstant.IP_ADDRESS_LOCATION);
+            if (!mAddress_location.isMulticastAddress()) {
+//                throw new NoMulticastException();
+                Log.i(TAG, "run: " + "NOT MULTICAST ADDRESS!");
+            }
             mSocket_location = new MulticastSocket(UDPConstant.LOCATION_PORT);
             mSocket_location.setTimeToLive(UDPConstant.TTLTIME);
             //仅仅创建
@@ -137,11 +156,6 @@ public class MultiCastServiceSend extends Service {
             e.printStackTrace();
         }
 
-        if (workThread == null) {
-            Log.d(TAG, "MultiCastServiceSend start");
-            workThread = new WorkThread();
-            workThread.start();
-        }
         if (workThread_location == null) {
             Log.d(TAG, "MultiCastServiceSend for location start");
             workThread_location = new WorkThread_Location();
@@ -159,6 +173,10 @@ public class MultiCastServiceSend extends Service {
             workThread.destory();
             workThread = null;
         }
+        stopSelf(startId);
+    }
+    public void stopSend_Location() {
+        Log.d(TAG, "MultiCastServiceSend stop location");
         mSocket_location.close();
         if (workThread_location != null) {
             Log.d(TAG, "MultiCastServiceSend kill work thread");
@@ -198,7 +216,6 @@ public class MultiCastServiceSend extends Service {
                     e.printStackTrace();
                 }
         }
-
         public void destory() {
             this.interrupt();
         }
@@ -226,7 +243,7 @@ public class MultiCastServiceSend extends Service {
                     datagramPacket = new DatagramPacket(data, data.length, mAddress_location, UDPConstant.LOCATION_PORT);
                     mSocket_location.send(datagramPacket);
                     Log.i(TAG, Integer.toString(getRandomNumber()) + "send Spot name:" + spot_location.getP_id() + " to " + mAddress_location.getHostAddress());
-                    Thread.sleep(UDPConstant.SEND_VIEW_UPDATA_INTERVAL_MS );
+                    Thread.sleep(UDPConstant.SEND_LOCATION_UPDATA_INTERVAL_MS );
                 }
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
