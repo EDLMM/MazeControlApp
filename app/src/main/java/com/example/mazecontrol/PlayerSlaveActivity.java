@@ -107,14 +107,11 @@ public class PlayerSlaveActivity extends AppCompatActivity {
                 {
                     if(mService.isCellGroupInitialized() ) {
                         Log.d(TAG, "update view");
-                        randomMazeGame.setTopologyByCellGroup(mService.getServiceCellGroup());
+                        randomMazeGame.setAllByCellGroup(mService.getServiceCellGroup());
                         randomMazeGame.invalidate();
                         randomMazeGame.setVisibility(View.VISIBLE);
                     }
                 }
-                // uncomment this line if you had sent some data
-//                String data = intent.getStringExtra("data"); // data is a key specified to intent while sending broadcast
-//                Log.e(TAG, "data=="+data);
             }
             catch (Exception ex)
             {

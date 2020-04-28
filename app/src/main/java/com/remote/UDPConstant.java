@@ -2,9 +2,10 @@ package com.remote;
 
 public class UDPConstant {
     public static final String IP_ADDRESS = "224.0.0.1"; //地址范围是224.0.0.0至239.255.255.255
-    public static final int PORT = 8189;
+    public static final int PORT = 8189; // port for maze topology
+    public static final int LOCATION_PORT = 8289;//port for updating location
     public static final int TTLTIME = 1;
-    public static final int CELL_GROUP_SERIALIZABLE_BUF = 4096 ;
+    public static final int CELL_GROUP_SERIALIZABLE_BUF = 2048 ;
     public static final long MAZE_CELL_SERIALIZABLE_UUID=1568398;
     public static final long MAZE_COMMAND_SERIALIZABLE_UUID=981274398;
 

@@ -35,11 +35,17 @@ public class CustomView extends View {
 
     private Cell[][] cells;
     private Cell player,exit;
-    private static final int COLS=7, ROWS=10, GOLD_NUM=5;
+    private static final int COLS=MazeConstant.COLS, ROWS=MazeConstant.ROWS, GOLD_NUM=MazeConstant.GOLD_NUM;
+    private static final int NUM_PLAYER=MazeConstant.NUM_PLAYER;
     private int gold_num_record=GOLD_NUM;
     private float cellSize,hMargin,vMargin;
     private static final float WALL_THICKNESS=4;
     private Paint wallPaint,playerPaint,exitPaint,goldPaint;
+
+
+    private int player_id; // -1 admin, 0<id = player
+    private int[][] player_group; // use stack for unlimited players
+    private MazeConstant.role role=MazeConstant.role.PLAYER; //default at player
 
     private Random random;
 
@@ -228,7 +234,6 @@ public class CustomView extends View {
             createMaze();
         }
 
-
     }
 
     @Override
@@ -397,10 +402,24 @@ public class CustomView extends View {
             next.leftWall=false;
         }
     }
-    public void setTopologyByCellGroup(CellGroup cg){
+    // set the admin role
+    // initialzie player group
+    public void setAdminRole(){
+        this.role=MazeConstant.role.ADMIN;
+
+    }
+
+    public void setAllByCellGroup(CellGroup cg){
         player = cg.player;
         cells = cg.cells;
     }
+    public void setPlayerByCellGroup(CellGroup cg){
+
+    }
+    public void setWallByCellGroup(CellGroup cg){
+
+    }
+
     public CellGroup getCells(){
         return new CellGroup(cells,player,COLS,ROWS);
     }

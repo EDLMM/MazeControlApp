@@ -11,6 +11,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.example.mazecontrol.Views.CellGroup;
+import com.example.mazecontrol.Views.Spot_Location;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,11 +27,19 @@ import java.util.Random;
 public class MultiCastServiceSend extends Service {
 
     private static final String TAG = "Remote";
+    private int startId;
+
+    // for topology
     private static WorkThread workThread;
     private MulticastSocket mSocket;
     private InetAddress mAddress;
-    private int startId;
     private CellGroup cellGroup=null;
+
+    //for location
+    private static WorkThread_Location workThread_location;
+    private MulticastSocket mSocket_location;
+    private InetAddress mAddress_location;
+    private Spot_Location spot_location=null;
 
     public MultiCastServiceSend(){
 
@@ -67,6 +76,7 @@ public class MultiCastServiceSend extends Service {
     public void setServiceCellGroup(CellGroup cellsFromView){
         cellGroup = cellsFromView;
     }
+    public void setServiceSpotLocation(Spot_Location spotFromView){spot_location=spotFromView;}
 
 
     @Override
@@ -109,6 +119,7 @@ public class MultiCastServiceSend extends Service {
         try {
             Log.e(TAG, "onCreate set socket");
             mAddress = InetAddress.getByName(UDPConstant.IP_ADDRESS);
+            mAddress_location = InetAddress.getByName(UDPConstant.IP_ADDRESS);
 
             if (!mAddress.isMulticastAddress()) {
 //                throw new NoMulticastException();
@@ -118,6 +129,8 @@ public class MultiCastServiceSend extends Service {
             mSocket = new MulticastSocket(UDPConstant.PORT);
             mSocket.setTimeToLive(UDPConstant.TTLTIME);
 //            mSocket.joinGroup(mAddress);
+            mSocket_location = new MulticastSocket(UDPConstant.LOCATION_PORT);
+            mSocket_location.setTimeToLive(UDPConstant.TTLTIME);
             //仅仅创建
 //            new WorkThread().start();
         } catch (Exception e) {
@@ -128,6 +141,11 @@ public class MultiCastServiceSend extends Service {
             Log.d(TAG, "MultiCastServiceSend start");
             workThread = new WorkThread();
             workThread.start();
+        }
+        if (workThread_location == null) {
+            Log.d(TAG, "MultiCastServiceSend for location start");
+            workThread_location = new WorkThread_Location();
+            workThread_location.start();
         }
     }
     /**
@@ -140,6 +158,12 @@ public class MultiCastServiceSend extends Service {
             Log.d(TAG, "MultiCastServiceSend kill work thread");
             workThread.destory();
             workThread = null;
+        }
+        mSocket_location.close();
+        if (workThread_location != null) {
+            Log.d(TAG, "MultiCastServiceSend kill work thread");
+            workThread_location.destory();
+            workThread_location = null;
         }
         stopSelf(startId);
     }
@@ -179,5 +203,40 @@ public class MultiCastServiceSend extends Service {
             this.interrupt();
         }
     }
+
+    private class WorkThread_Location extends Thread{
+        @Override
+        public void run() {
+            DatagramPacket datagramPacket = null;
+            try {
+                Log.d(TAG, "MultiCastServiceSend location Sending");
+                while (true) {
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();//程序内部创建一个byte型别数组的缓冲区，然后利用ByteArrayOutputStream和ByteArrayInputStream的实例向数组中写入或读出byte型数据
+                    ObjectOutputStream oos = null;
+                    try {
+                        oos = new ObjectOutputStream(bos);
+                        oos.writeObject(spot_location);
+                        //                oos.flush();
+                        oos.close(); //从内存中直接释放，因为下次还要new
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d(TAG,"spot Location 序列化后字节数：" + bos.toByteArray().length);
+                    byte[] data = bos.toByteArray();       //转化为字节数组
+                    datagramPacket = new DatagramPacket(data, data.length, mAddress_location, UDPConstant.LOCATION_PORT);
+                    mSocket_location.send(datagramPacket);
+                    Log.i(TAG, Integer.toString(getRandomNumber()) + "send Spot name:" + spot_location.getP_id() + " to " + mAddress_location.getHostAddress());
+                    Thread.sleep(UDPConstant.SEND_VIEW_UPDATA_INTERVAL_MS );
+                }
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void destory() {
+            this.interrupt();
+        }
+    }
+
 
 }

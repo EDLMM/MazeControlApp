@@ -19,35 +19,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.example.mazecontrol.Views.CustomView;
-import com.example.mazecontrol.Views.HostMazeView;
-import com.gongw.remote.Device;
-import com.gongw.remote.RemoteConst;
-import com.gongw.remote.communication.host.Command;
-import com.gongw.remote.communication.host.CommandSender;
-import com.gongw.remote.search.DeviceSearcher;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.remote.MazeTopoCommand;
 import com.remote.MultiCastServiceSend;
 import com.remote.UDPConstant;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -133,7 +119,7 @@ public class AdminHostActivity extends AppCompatActivity {
         Log.d("Remote","onClickReGenerateMaze");
     }
 
-    public void onClickSearchPlayer(View view) throws IOException, ClassNotFoundException {
+    public void onClickSendOne(View view) throws IOException, ClassNotFoundException {
         Log.d("Remote","onClick Send one message");
         // 搜索设备
         new SendThread().start();
@@ -178,8 +164,8 @@ public class AdminHostActivity extends AppCompatActivity {
 
     private boolean isOpen=false;
 
-    public void onClickSendAlert(View view){
-        Log.d("Remote","onClickSendAlert");
+    public void onClickMazeSendSwitch(View view){
+        Log.d("Remote","onClickMazeSendSwitch");
         if(isOpen){
             //停止响应搜索
             stopSendService();
