@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -114,8 +115,11 @@ public class MultiCastServiceSend extends Service {
     }
     @Override
     public void onDestroy(){
+
         Log.e(TAG, "onDestroy");
         stopSend();
+        stopSend_Location();
+        Toast.makeText(this, "发送服务已经停止", Toast.LENGTH_LONG).show();
         super.onDestroy();
     }
 
@@ -264,6 +268,4 @@ public class MultiCastServiceSend extends Service {
             this.interrupt();
         }
     }
-
-
 }

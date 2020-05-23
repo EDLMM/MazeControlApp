@@ -38,12 +38,12 @@ tools:context=".AdminHostActivity">
 
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginBottom="36dp"
+        android:layout_marginBottom="4dp"
         android:onClick="onClickReGenerateMaze"
         android:text="重置"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.089"
+        app:layout_constraintHorizontal_bias="0.566"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
@@ -52,12 +52,12 @@ tools:context=".AdminHostActivity">
 
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginBottom="36dp"
+        android:layout_marginBottom="4dp"
         android:onClick="onClickSendOne"
         android:text="单次发送"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintHorizontal_bias="0.949"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
@@ -66,28 +66,37 @@ tools:context=".AdminHostActivity">
 
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginBottom="36dp"
+        android:layout_marginBottom="64dp"
         android:onClick="onClickMazeSendSwitch"
         android:text="切换持续发送"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.919"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.example.mazecontrol.Views.CustomView
-    android:id="@+id/random_maze_game"
+        android:id="@+id/random_maze_game"
 
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    android:layout_marginTop="32dp"
-    android:layout_marginBottom="32dp"
-    app:layout_constraintBottom_toTopOf="@+id/btn_resume_canvas"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="0.0"
-    app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginBottom="64dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_resume_canvas"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
 
-    app:layout_constraintTop_toBottomOf="@+id/topbar"
-    app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/topbar"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="已加入玩家：Mi8\n已加入玩家：LAYE\n"
+        app:layout_constraintTop_toBottomOf="@+id/random_maze_game"
+        tools:layout_editor_absoluteX="16dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

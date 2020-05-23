@@ -2,6 +2,7 @@ package com.example.mazecontrol;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -30,7 +31,7 @@ import com.remote.UDPConstant;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PlayerSlaveActivity extends AppCompatActivity {
+public class PlayerSlaveActivity extends Activity {
     @BindView(R.id.topbar)
     QMUITopBarLayout mTopBar;
     // CustomView, i.e. random maze generation
@@ -50,6 +51,8 @@ public class PlayerSlaveActivity extends AppCompatActivity {
     MultiCastServiceSend mServiceSend; //绑定服务
     boolean mBoundSend = false; //服务绑定变了
 
+    //网络
+    WifiManager.MulticastLock lock=null;
     public static void actionStart(Context context, String data1){
         Intent intent=new Intent(context,PlayerSlaveActivity.class );
         intent.putExtra("param1",data1);
@@ -77,7 +80,7 @@ public class PlayerSlaveActivity extends AppCompatActivity {
 
         WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (wifi != null){
-            WifiManager.MulticastLock lock = wifi.createMulticastLock("mylock");
+            lock = wifi.createMulticastLock("mylock");
             lock.acquire();
         }
 
@@ -118,6 +121,8 @@ public class PlayerSlaveActivity extends AppCompatActivity {
         mBoundReceive = false;
         stopReceiveServiceTopo();
 
+        //释放网络
+        lock.release();
     }
 
     /**

@@ -95,6 +95,7 @@ public class AdminHostActivity extends AppCompatActivity {
         }
 
         randomMazeGame =(CustomView) findViewById(R.id.random_maze_game);
+        randomMazeGame.setAdminRole();
         // update the serializable cell group in background service once the view is changed
         randomMazeGame.setOnTouchListener(new OnTouchListener() {
             @Override

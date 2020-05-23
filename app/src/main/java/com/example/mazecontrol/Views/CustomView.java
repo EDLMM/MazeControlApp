@@ -17,6 +17,8 @@ import androidx.annotation.RequiresApi;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
@@ -34,13 +36,18 @@ public class CustomView extends View {
     }
 
     private Cell[][] cells;
+    private ArrayList<Cell> DoorPairCellA = new ArrayList<>();
+    private ArrayList<Cell> DoorPairCellB = new ArrayList<>();
+    private ArrayList<Cell> DoorPairCellC = new ArrayList<>();
+
     private Cell player,exit;
-    private static final int COLS=MazeConstant.COLS, ROWS=MazeConstant.ROWS, GOLD_NUM=MazeConstant.GOLD_NUM;
+    private static final int COLS=MazeConstant.COLS, ROWS=MazeConstant.ROWS,
+            GOLD_NUM=MazeConstant.GOLD_NUM,DOOR_NUM=MazeConstant.NUM_DOOR;
     private static final int NUM_PLAYER=MazeConstant.NUM_PLAYER;
     private int gold_num_record=GOLD_NUM;
     private float cellSize,hMargin,vMargin;
     private static final float WALL_THICKNESS=4;
-    private Paint wallPaint,playerPaint,exitPaint,goldPaint;
+    private Paint wallPaint,playerPaint,exitPaint,goldPaint,doorPaint,doorTouchPaint;
 
 
     private int player_id; // -1 admin, 0<id = player
@@ -98,17 +105,16 @@ public class CustomView extends View {
         goldPaint=new Paint();
         goldPaint.setColor(Color.YELLOW);
 
+        doorPaint=new Paint();
+        doorPaint.setColor(0xFFFF7F50);
+
+        doorTouchPaint=new Paint();
+        doorTouchPaint.setColor(0xFF7FC2D8);
     }
     @Override
     protected void onDraw(Canvas canvas){
         canvas.drawColor(Color.LTGRAY);
-//        canvas.drawPoint(5,5,mPaint);
-//        canvas.drawPoint(200,200,mPaint);
-//        canvas.drawPoints(new float[]{          //绘制一组点，坐标位置由float数组指定
-//                500,500,
-//                500,600,
-//                500,700
-//        },mPaint);
+
 
         int width=getWidth();
         int height=getHeight();
@@ -172,6 +178,31 @@ public class CustomView extends View {
                             goldPaint
                     );
                 }
+                // indicat it can be touch
+                if(this.role==MazeConstant.role.ADMIN){
+                    // draw door shaft
+                    if(cells[x][y].doorCell){
+                        int cellWallSum = cells[x][y].doorWalls[0]+cells[x][y].doorWalls[1];
+                        if(cellWallSum==(MazeConstant.TOPWALL+MazeConstant.LEFTWALL)){
+                            canvas.drawCircle(cells[x][y].col*cellSize,cells[x][y].row*cellSize,margin,doorPaint);
+                        }else if(cellWallSum==(MazeConstant.TOPWALL+MazeConstant.RIGHTWALL)){
+                            canvas.drawCircle((cells[x][y].col+1)*cellSize,cells[x][y].row*cellSize,margin,doorPaint);
+                        }else if(cellWallSum==(MazeConstant.BOTTOMWALL+MazeConstant.LEFTWALL)){
+                            canvas.drawCircle(cells[x][y].col*cellSize,(cells[x][y].row+1)*cellSize,margin,doorPaint);
+                        }else if(cellWallSum==(MazeConstant.BOTTOMWALL+MazeConstant.RIGHTWALL)){
+                            canvas.drawCircle((cells[x][y].col+1)*cellSize,(cells[x][y].row+1)*cellSize,margin,doorPaint);
+                        }else{
+                            Log.d("ShowMazeActivity",String.format("can't draw door at %d %d", x,y));
+                        }
+                        canvas.drawRect(
+                                cells[x][y].col*cellSize+margin,
+                                cells[x][y].row*cellSize+margin,
+                                (cells[x][y].col+1)*cellSize-margin,
+                                (cells[x][y].row+1)*cellSize-margin,
+                                doorTouchPaint
+                        );
+                    }
+                }
             }
         }
 
@@ -232,53 +263,135 @@ public class CustomView extends View {
         if(player==exit && gold_num_record<=0) {
             gold_num_record=GOLD_NUM;
             createMaze();
+            DoorPairCellA = new ArrayList<>();
+            createDoors();
         }
 
+    }
+    private void reverseDoorWall(Cell cell,int i){
+        switch (cell.doorWalls[i]){
+            case MazeConstant.TOPWALL:
+                cell.topWall=!cell.topWall;
+                break;
+            case MazeConstant.LEFTWALL:
+                cell.leftWall=!cell.leftWall;
+                break;
+            case MazeConstant.RIGHTWALL:
+                cell.rightWall=!cell.rightWall;
+                break;
+            case MazeConstant.BOTTOMWALL:
+                cell.bottomWall=!cell.bottomWall;
+                break;
+            default:
+                Log.d("ShowMazeActivity",String.format("can't move door"));
+                break;
+        }
+    }
+    private boolean moveDoor(int doorCellIndex){
+        Cell doorcell=DoorPairCellA.get(doorCellIndex);
+        Cell doorcellB=DoorPairCellB.get(doorCellIndex);
+        Cell doorcellC=DoorPairCellC.get(doorCellIndex);
+
+        reverseDoorWall(doorcell,0);
+        reverseDoorWall(doorcell,1);
+        reverseDoorWall(doorcellB,0);
+        reverseDoorWall(doorcellC,0);
+//        int cellWallSum = doorcell.doorWalls[0]+doorcell.doorWalls[1];
+//
+//        if(cellWallSum==(MazeConstant.TOPWALL+MazeConstant.LEFTWALL)){
+//            doorcell.topWall=!doorcell.topWall;
+//            doorcell.leftWall=!doorcell.leftWall;
+//
+//        }else if(cellWallSum==(MazeConstant.TOPWALL+MazeConstant.RIGHTWALL)){
+//            doorcell.topWall=!doorcell.topWall;
+//            doorcell.rightWall=!doorcell.rightWall;
+//        }else if(cellWallSum==(MazeConstant.BOTTOMWALL+MazeConstant.LEFTWALL)){
+//            doorcell.bottomWall=!doorcell.bottomWall;
+//            doorcell.leftWall=!doorcell.leftWall;
+//        }else if(cellWallSum==(MazeConstant.BOTTOMWALL+MazeConstant.RIGHTWALL)){
+//            doorcell.bottomWall=!doorcell.bottomWall;
+//            doorcell.rightWall=!doorcell.rightWall;
+//        }else{
+//
+//        }
+        invalidate();
+        return true;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
-
         if(event.getAction()==MotionEvent.ACTION_DOWN)
-           return true;
+            return true;
+
+        if(event.getAction()==MotionEvent.ACTION_UP){
+            if (this.role==MazeConstant.role.ADMIN){
+                // event position
+                float x = event.getX();
+                float y = event.getY();
+                for(int i = 0;i < DoorPairCellA.size(); i ++){
+                    Cell doorcell=cells[DoorPairCellA.get(i).col][DoorPairCellA.get(i).row];
+
+                    // doorcell location
+                    float CenterX = hMargin + (doorcell.col+0.5f)*cellSize;
+                    float CenterY = vMargin + (doorcell.row+0.5f)*cellSize;
+                    // could be negative
+                    float dx = x - CenterX;
+                    float dy = y - CenterY;
+
+                    float absDx = Math.abs(dx);
+                    float absDy = Math.abs(dy);
+
+                    if (absDx < 0.5f*cellSize && absDy < 0.5f*cellSize){
+                        Log.d("ShowMazeActivity",String.format("click at col %d row %d",doorcell.col,doorcell.row));
+                        if (moveDoor(i))
+                            break;
+                    }
+                }
+            }
+            return true;
+        }
 
         // ACTION_MOVE can only be get after ACTION_DOWN
         if(event.getAction()==MotionEvent.ACTION_MOVE){
             // event position
             float x = event.getX();
             float y = event.getY();
-            // player location
-            float playerCenterX = hMargin + (player.col+0.5f)*cellSize;
-            float playerCenterY = vMargin + (player.row+0.5f)*cellSize;
 
-            // could be negative
-            float dx = x - playerCenterX;
-            float dy = y - playerCenterY;
+            // only player can move
+            if (this.role==MazeConstant.role.PLAYER){
+                // player location
+                float playerCenterX = hMargin + (player.col+0.5f)*cellSize;
+                float playerCenterY = vMargin + (player.row+0.5f)*cellSize;
 
-            float absDx = Math.abs(dx);
-            float absDy = Math.abs(dy);
+                // could be negative
+                float dx = x - playerCenterX;
+                float dy = y - playerCenterY;
 
-            if (absDx > cellSize || absDy > cellSize){
-                //move in x-direction
-                if (absDx > absDy){
-                    // move to right
-                    if ( dx > 0){
-                        movePlayer(Direction.RIGHT);
+                float absDx = Math.abs(dx);
+                float absDy = Math.abs(dy);
+
+                if (absDx > cellSize || absDy > cellSize){
+                    //move in x-direction
+                    if (absDx > absDy){
+                        // move to right
+                        if ( dx > 0){
+                            movePlayer(Direction.RIGHT);
+                        }
+                        // move to left
+                        else{
+                            movePlayer(Direction.LEFT);
+                        }
                     }
-                    // move to left
+                    //move in y-direction
                     else{
-                        movePlayer(Direction.LEFT);
-                    }
-                }
-                //move in y-direction
-                else{
-                    // move down
-                    if(dy > 0){
-                        movePlayer(Direction.DOWN);
-                    }
-                    // move up
-                    else{
-                        movePlayer(Direction.UP);
+                        // move down
+                        if(dy > 0){
+                            movePlayer(Direction.DOWN);
+                        }
+                        // move up
+                        else{
+                            movePlayer(Direction.UP);
+                        }
                     }
                 }
             }
@@ -291,6 +404,8 @@ public class CustomView extends View {
         Log.d("ShowMazeActivity","reGenerate New Maze");
 //        return String.format("Successfully click ClickReGeneration,\nPass in message:%s",Pass_in);
         createMaze();
+        DoorPairCellA = new ArrayList<>();
+        createDoors();
         invalidate();//refresh
     }
 
@@ -402,11 +517,137 @@ public class CustomView extends View {
             next.leftWall=false;
         }
     }
+
+
     // set the admin role
     // initialzie player group
     public void setAdminRole(){
+        Log.d("ShowMazeActivity",String.format("1111"));
         this.role=MazeConstant.role.ADMIN;
+        createDoors();
+        Log.d("ShowMazeActivity",String.format("1111"));
+    }
 
+    // create movable door
+    private void createDoors(){
+//        DoorPairCellB
+        int gRow,gCol;
+        Cell selected;
+        Log.d("ShowMazeActivity",String.format("2222"));
+        while (DoorPairCellA.size() < DOOR_NUM){
+            gRow = random.nextInt(ROWS);
+            gCol = random.nextInt(COLS);
+            // not at the edge
+            if ((gRow<ROWS-1 && gRow> 0 ) && (gCol< COLS-1 && gCol> 0 )){
+                selected = cells[gCol][gRow];
+                if (!selected.placeGold && !DoorPairCellA.contains(selected) &&
+                        !DoorPairCellB.contains(selected) && !DoorPairCellC.contains(selected)){
+                    if(setPairDoorWall(selected)){
+                        DoorPairCellA.add(selected);
+                        selected.doorCell=true;
+                        Log.d("ShowMazeActivity",String.format("generate door at col %d row %d",gCol,gRow));
+                    }
+                }
+            }
+
+        }
+    }
+
+    private boolean setPairDoorWall(Cell cellA){
+
+        if (!cellA.topWall){
+            int [] arr = {MazeConstant.LEFTWALL,MazeConstant.RIGHTWALL};
+            int index=(int)(Math.random()*arr.length);
+            int randWall = arr[index];
+            if ( (randWall==MazeConstant.RIGHTWALL&&!cellA.rightWall) ||
+                    (randWall==MazeConstant.LEFTWALL&&!cellA.leftWall))
+                return false;
+            else{
+                cellA.doorWalls[0]=MazeConstant.TOPWALL;
+                cellA.doorWalls[1]=randWall;
+                if(randWall==MazeConstant.RIGHTWALL){
+                    DoorPairCellB.add(cells[cellA.col+1][cellA.row]);
+                    cells[cellA.col+1][cellA.row].doorWalls[0]=MazeConstant.LEFTWALL;
+                }
+                else{
+                    DoorPairCellB.add(cells[cellA.col-1][cellA.row]);
+                    cells[cellA.col-1][cellA.row].doorWalls[0]=MazeConstant.RIGHTWALL;
+                }
+                DoorPairCellC.add(cells[cellA.col][cellA.row-1]);
+                cells[cellA.col][cellA.row-1].doorWalls[0]=MazeConstant.BOTTOMWALL;
+            }
+        }
+        else if(!cellA.leftWall){
+            int [] arr = {MazeConstant.TOPWALL,MazeConstant.BOTTOMWALL};
+            int index=(int)(Math.random()*arr.length);
+            int randWall = arr[index];
+            if ( (randWall==MazeConstant.TOPWALL&&!cellA.topWall) ||
+                    (randWall==MazeConstant.BOTTOMWALL&&!cellA.bottomWall))
+                return false;
+            else{
+                cellA.doorWalls[0]=MazeConstant.LEFTWALL;
+                cellA.doorWalls[1]=randWall;
+                if(randWall==MazeConstant.TOPWALL) {
+                    DoorPairCellB.add(cells[cellA.col][cellA.row - 1]);
+                    cells[cellA.col][cellA.row - 1].doorWalls[0]=MazeConstant.BOTTOMWALL;
+                }
+                else{
+                    DoorPairCellB.add(cells[cellA.col][cellA.row+1]);
+                    cells[cellA.col][cellA.row+1].doorWalls[0]=MazeConstant.TOPWALL;
+                }
+                DoorPairCellC.add(cells[cellA.col-1][cellA.row]);
+                cells[cellA.col-1][cellA.row].doorWalls[0]=MazeConstant.RIGHTWALL;
+            }
+        }
+        else if(!cellA.rightWall){
+            int [] arr = {MazeConstant.TOPWALL,MazeConstant.BOTTOMWALL};
+            int index=(int)(Math.random()*arr.length);
+            int randWall = arr[index];
+            if ( (randWall==MazeConstant.TOPWALL&&!cellA.topWall) ||
+                    (randWall==MazeConstant.BOTTOMWALL&&!cellA.bottomWall))
+                return false;
+            else {
+                cellA.doorWalls[0] = MazeConstant.RIGHTWALL;
+                cellA.doorWalls[1] = randWall;
+                if(randWall==MazeConstant.TOPWALL) {
+                    DoorPairCellB.add(cells[cellA.col][cellA.row - 1]);
+                    cells[cellA.col][cellA.row - 1].doorWalls[0]=MazeConstant.BOTTOMWALL;
+                }
+                else{
+                    DoorPairCellB.add(cells[cellA.col][cellA.row+1]);
+                    cells[cellA.col][cellA.row+1].doorWalls[0]=MazeConstant.TOPWALL;
+                }
+                DoorPairCellC.add(cells[cellA.col+1][cellA.row]);
+                cells[cellA.col+1][cellA.row].doorWalls[0]=MazeConstant.LEFTWALL;
+            }
+        }
+        else if(!cellA.bottomWall){
+            int [] arr = {MazeConstant.LEFTWALL,MazeConstant.RIGHTWALL};
+            int index=(int)(Math.random()*arr.length);
+            int randWall = arr[index];
+            if ( (randWall==MazeConstant.RIGHTWALL&&!cellA.rightWall) ||
+                    (randWall==MazeConstant.LEFTWALL&&!cellA.leftWall))
+                return false;
+            else {
+                cellA.doorWalls[0] = MazeConstant.BOTTOMWALL;
+                cellA.doorWalls[1] = randWall;
+                if(randWall==MazeConstant.RIGHTWALL){
+                    DoorPairCellB.add(cells[cellA.col+1][cellA.row]);
+                    cells[cellA.col+1][cellA.row].doorWalls[0]=MazeConstant.LEFTWALL;
+                }
+                else{
+                    DoorPairCellB.add(cells[cellA.col-1][cellA.row]);
+                    cells[cellA.col-1][cellA.row].doorWalls[0]=MazeConstant.RIGHTWALL;
+                }
+                DoorPairCellC.add(cells[cellA.col][cellA.row+1]);
+                cells[cellA.col][cellA.row+1].doorWalls[0]=MazeConstant.TOPWALL;
+            }
+        }
+        // the cell can't be used for movable doors
+        else{
+            return false;
+        }
+        return true;
     }
 
     public void setAllByCellGroup(CellGroup cg){

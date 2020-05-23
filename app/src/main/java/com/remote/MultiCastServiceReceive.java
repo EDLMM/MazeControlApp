@@ -8,6 +8,7 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -161,8 +162,11 @@ public class MultiCastServiceReceive extends IntentService {
 
     @Override
     public void onDestroy(){
+
         Log.e(TAG, "onDestroy");
         stopReceive();
+        stopReceive_Location();
+        Toast.makeText(this, "接收服务已经停止", Toast.LENGTH_LONG).show();
         super.onDestroy();
     }
 

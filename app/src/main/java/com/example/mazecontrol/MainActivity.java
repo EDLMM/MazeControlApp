@@ -3,12 +3,15 @@ package com.example.mazecontrol;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.IntentFilter;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -19,9 +22,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     @BindView(R.id.topbar) QMUITopBarLayout mTopBar;
-
+    @BindView(R.id.loginCode)
+    TextView mLoginCodeText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +52,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickAdminHostActivity(View view){
-        AdminHostActivity.actionStart(this,"start from mainAct");
+//        if (mLoginCodeText.getText().toString().equals("admin") ){
+            AdminHostActivity.actionStart(this,"start from mainAct");
+//        }else{
+//            Toast.makeText(this, "请输入正确的管理员登录码", Toast.LENGTH_SHORT).show();
+//        }
     }
 
     public void onClickPlayerSlaveActivity(View view){
         PlayerSlaveActivity.actionStart(this,"start from mainAct");
+//        if (mLoginCodeText.getText().toString().equals("player")){
+//            PlayerSlaveActivity.actionStart(this,"start from mainAct");
+//        }else{
+//            Toast.makeText(this, "请输入正确的玩家登录码", Toast.LENGTH_SHORT).show();
+//        }
     }
 
     private void initTopBar() {
